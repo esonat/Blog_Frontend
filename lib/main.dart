@@ -4,6 +4,8 @@ import 'models/Post.dart';
 import 'models/Category.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:dart_json_mapper/dart_json_mapper.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -16,6 +18,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      home:const HomePage(title:'Blog'),
+      //  body: const HomePage(title: 'Blog'),
       title: 'Blog',
       theme: ThemeData(
         // This is the theme of your application.
@@ -29,12 +33,35 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const HomePage(title: 'Blog'),
+    //  home: const HomePage(title: 'Blog'),
       initialRoute: '/',
       routes: {
         '/posts': (context) => const HomePage(title:'Blog'),
+        '/createPost': (context) => const PostForm(),
       },
     );
+  }
+}
+
+class HeaderWidget extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar:AppBar(
+      title: const Text('Blog'),
+      actions: <Widget>[
+        TextButton(
+          child: const Text('Create Post',style: TextStyle(fontSize: 18.0, color: Colors.white)),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => PostForm()));
+          },
+        ),
+      ],
+    ),
+  );
   }
 }
 
@@ -68,7 +95,7 @@ Future<Post>? getPost(int id) async {
   };
 
   final response = await http.get(Uri.parse('http://localhost:8080/posts/'+id.toString()));
-  JsonMap posts=await json.decode(response.body);
+  dynamic post=await json.decode(response.body) as dynamic;
   Post? result;
 
   // if(response.statusCode == 200) {
@@ -80,7 +107,7 @@ Future<Post>? getPost(int id) async {
   // }
 
   if(response.statusCode == 200) {
-    result=Post.fromJson(posts[0]);
+    result=Post.fromJson(post);
   }else {
     throw Exception("Failed to load post");
   }
@@ -89,6 +116,27 @@ Future<Post>? getPost(int id) async {
 
   return result;
 }
+
+Future<List<Category>> allCategories() async {
+  final response = await http.get(Uri.parse('http://localhost:8080/categories'));
+  List<dynamic> categories=await json.decode(response.body);
+  List<Category> result=[];
+
+  if(response.statusCode == 200) {
+    for(var i=0;i<categories.length;i++) {
+      result.add(Category.fromJson(categories[i]));
+    }
+  }else {
+    throw Exception("Failed to load categories");
+  }
+
+  for(var i=0;i<result.length;i++){
+      print(result[i].toString());
+  }
+
+  return result;
+}
+
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.title}) : super(key: key);
@@ -181,6 +229,16 @@ class _HomePageState extends State<HomePage> {
         //Here we take the value from the MyHomePage object that was created by
         //the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Create Post',style: TextStyle(fontSize: 18.0, color: Colors.white)),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PostForm()));
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -235,12 +293,24 @@ class _PostDetailPageState extends State<PostDetailPage> {
     List<Widget> children=[];
 
     children.add(
-      Row(
+      Column(
         children: [
-          Expanded(child:Text(post.title,style:TextStyle(fontSize:18.0,fontWeight:FontWeight.w700))),
-        ],
-      ),
-    );
+            Row(children: [
+              Expanded(
+                child: Text(post.title,style:TextStyle(fontSize:18.0,fontWeight:FontWeight.w700))
+              ),
+            ],
+          ),
+          const SizedBox(height:50),
+            Row(children: [
+              Expanded(
+                child: Text(post.text,style:TextStyle(fontSize:14.0,fontWeight:FontWeight.w300)),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
 
     return Container(
       width:500,
@@ -279,4 +349,147 @@ class IdParameter{
   final int id;
 
   IdParameter(this.id);
+}
+
+
+
+class PostForm extends StatefulWidget {
+  const PostForm({Key? key}) : super(key: key);
+
+  @override
+  PostFormState createState() {
+    return PostFormState();
+  }
+}
+
+class PostFormState extends State<PostForm> {
+  final _formKey=GlobalKey<FormState>();
+
+  Future<List<DropdownMenuItem<String>>> categoryNames() async {
+    List<Category> categories=await allCategories();
+    List<DropdownMenuItem<String>> list=[];
+    List<String> names=[];
+
+    if(categories!=null){
+      for(var i=0;i<categories.length;i++) {
+        list.add(DropdownMenuItem<String>(
+          value:categories[i].name,
+          child:Text(categories[i].name),
+        ));
+
+        names.add(categories[i].name);
+      }
+    }
+
+
+    //
+    // items: <String>['One', 'Two', 'Free', 'Four']
+    //     .map<DropdownMenuItem<String>>((String value) {
+    //   return DropdownMenuItem<String>(
+    //     value: value,
+    //     child: Text(value),
+    //   );
+    // }).toList(),
+      return names.map<DropdownMenuItem<String>>((String value){
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList();
+  }
+
+
+
+  late Future<List<DropdownMenuItem<String>>> futureCategories;
+
+  @override
+  void initState() {
+    super.initState();
+    futureCategories=categoryNames();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String dropdownValue = 'Technology';
+
+    return Scaffold(
+      body: Form(
+      key: _formKey,
+      child: Container(
+        width:500,
+        child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Title'),
+          TextFormField(
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter some text';
+              }
+              return null;
+            },
+          ),
+          const Text('Text'),
+          TextFormField(
+            maxLines:8,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter some text';
+              }
+              return null;
+            },
+          ),
+          FutureBuilder(
+            future: futureCategories,
+            builder:  (context, snapshot) {
+              if (snapshot.hasData) {
+                return DropdownButton<String>(
+                value: dropdownValue,
+                icon: const Icon(Icons.arrow_downward),
+                elevation: 16,
+                style: const TextStyle(color: Colors.deepPurple),
+                underline: Container(
+                  height: 2,
+                  color: Colors.deepPurpleAccent,
+                ),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    dropdownValue = newValue!;
+                  });
+                },
+                items: snapshot.data! as List<DropdownMenuItem<String>>,
+                // items: <String>['One', 'Two', 'Free', 'Four']
+                //     .map<DropdownMenuItem<String>>((String value) {
+                //   return DropdownMenuItem<String>(
+                //     value: value,
+                //     child: Text(value),
+                //   );
+                // }).toList(),
+          );
+        } else if(snapshot.hasError) {
+          return Text('${snapshot.error}');
+        }
+
+        return const CircularProgressIndicator();
+      },
+    ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: ElevatedButton(
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Processing Data')),
+                    );
+                }
+              },
+              child: const Text('Submit'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+    );
+  }
 }
