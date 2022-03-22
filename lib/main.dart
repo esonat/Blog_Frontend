@@ -365,6 +365,8 @@ class PostForm extends StatefulWidget {
 class PostFormState extends State<PostForm> {
   final _formKey=GlobalKey<FormState>();
 
+  String dropdownValue='1';
+
   Future<List<DropdownMenuItem<String>>> categoryNames() async {
     List<Category> categories=await allCategories();
     List<DropdownMenuItem<String>> list=[];
@@ -373,13 +375,15 @@ class PostFormState extends State<PostForm> {
     if(categories!=null){
       for(var i=0;i<categories.length;i++) {
         list.add(DropdownMenuItem<String>(
-          value:categories[i].name,
+          value:categories[i].id.toString(),
           child:Text(categories[i].name),
         ));
 
         names.add(categories[i].name);
       }
     }
+
+    return list;
 
 
     //
@@ -390,12 +394,12 @@ class PostFormState extends State<PostForm> {
     //     child: Text(value),
     //   );
     // }).toList(),
-      return names.map<DropdownMenuItem<String>>((String value){
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList();
+      // return names.map<DropdownMenuItem<String>>((String value){
+      //   return DropdownMenuItem<String>(
+      //     value: value,
+      //     child: Text(value),
+      //   );
+      // }).toList();
   }
 
 
@@ -410,7 +414,7 @@ class PostFormState extends State<PostForm> {
 
   @override
   Widget build(BuildContext context) {
-    String dropdownValue = 'Technology';
+
 
     return Scaffold(
       body: Form(
@@ -478,9 +482,10 @@ class PostFormState extends State<PostForm> {
             child: ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Processing Data')),
-                    );
+                  // ScaffoldMessenger.of(context).showSnackBar(
+                  //     const SnackBar(content: Text('Processing Data')),
+                  //   );
+                  
                 }
               },
               child: const Text('Submit'),
