@@ -48,6 +48,7 @@ class HeaderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar:AppBar(
       title: const Text('Blog'),
       actions: <Widget>[
@@ -89,7 +90,7 @@ Future<List<Post>?> allPosts() async {
   return result;
 }
 
-Future<Post>? getPost(int id) async {
+Future<Post>? getPost(int? id) async {
   Map<String, String> requestHeaders = {
     "Access-Control-Allow-Origin":"*",
   };
@@ -137,6 +138,37 @@ Future<List<Category>> allCategories() async {
   return result;
 }
 
+Future<Post> addPost(Post post) async {
+  // Map<String, String> requestHeaders = {
+  //   "Access-Control-Allow-Origin":"*",
+  // };
+  Map<String,dynamic> jsonBody={"ID":"5","Title":"title","Text":"text","Category":"1"};
+
+  final response = await http.post(
+    Uri.parse('http://localhost:8080/posts'),
+    // headers: <String, String>{
+    //   'Content-Type': 'application/json; charset=UTF-8',
+    // },
+    body: jsonEncode(<String, dynamic>{
+      'Title':post.title,
+      'Text':post.text,
+      'Category':post.category
+    }),
+  );
+
+    print(jsonEncode(<String, dynamic>{
+      'Title':post.title,
+      'Text':post.text,
+      'Category':post.category
+    }));
+    //jsonEncode(post));
+
+    if (response.statusCode == 201) {
+      return Post.fromJson(jsonDecode(response.body));
+    }else {
+      throw Exception("Failed to add post");
+    }
+  }
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.title}) : super(key: key);
@@ -169,6 +201,10 @@ class _HomePageState extends State<HomePage> {
     futurePosts=allPosts();
   }
 
+  FutureOr onGoBack(dynamic value) {
+    setState((){});
+  }
+
   Widget postWidgetList(List<Post> posts) {
 
     List<Widget> children=[];
@@ -190,7 +226,7 @@ class _HomePageState extends State<HomePage> {
                       arguments: IdParameter(posts[i].id),
                     ),
                   ),
-                  );
+                ).then(onGoBack);
                 },
                 child: Text(posts[i].title,style:TextStyle(fontSize:18.0,fontWeight:FontWeight.w700)))
              ),
@@ -240,7 +276,8 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Padding(
+      body: SingleChildScrollView(
+        child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: FutureBuilder<List<Post>?>(
           future: futurePosts,
@@ -257,6 +294,7 @@ class _HomePageState extends State<HomePage> {
           },
         ),
       ),
+    ),
     );
   }
 }
@@ -346,7 +384,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
 }
 
 class IdParameter{
-  final int id;
+  final int? id;
 
   IdParameter(this.id);
 }
@@ -405,6 +443,7 @@ class PostFormState extends State<PostForm> {
 
 
   late Future<List<DropdownMenuItem<String>>> futureCategories;
+  late Future<Post> futurePost;
 
   @override
   void initState() {
@@ -414,7 +453,9 @@ class PostFormState extends State<PostForm> {
 
   @override
   Widget build(BuildContext context) {
-
+    String title='title';
+    String text='text';
+    String categoryID='1';
 
     return Scaffold(
       body: Form(
@@ -428,9 +469,21 @@ class PostFormState extends State<PostForm> {
           TextFormField(
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter some text';
+                return 'Please enter title';
               }
+              title=value;
+
               return null;
+            },
+            onFieldSubmitted: (value) {
+              setState(() {
+                title=value;
+              });
+            },
+            onChanged: (String? value){
+              setState(() {
+                title=value!;
+              });
             },
           ),
           const Text('Text'),
@@ -440,7 +493,18 @@ class PostFormState extends State<PostForm> {
               if (value == null || value.isEmpty) {
                 return 'Please enter some text';
               }
+              text=value;
               return null;
+            },
+            onChanged: (String? value){
+              setState(() {
+                text=value!;
+              });
+            },
+            onFieldSubmitted: (value) {
+              setState(() {
+                text=value;
+              });
             },
           ),
           FutureBuilder(
@@ -485,7 +549,15 @@ class PostFormState extends State<PostForm> {
                   // ScaffoldMessenger.of(context).showSnackBar(
                   //     const SnackBar(content: Text('Processing Data')),
                   //   );
-                  
+                  print('Before post.Title:'+title+'Text:'+text+'Category:'+dropdownValue);
+                  Post post=Post(title:title,text:text,category:int.parse(dropdownValue));
+
+                  futurePost=addPost(post);
+                  print('Added post with title:'+title);
+                  Navigator.pop(context);
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) => const HomePage(title:'Blog')));
                 }
               },
               child: const Text('Submit'),

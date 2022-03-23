@@ -2,13 +2,13 @@ import 'dart:convert';
 
 class Post {
   Post({
-    required this.id,
+    this.id,
     required this.title,
     required this.text,
     required this.category
   });
 
-  int id;
+  int? id;
   String title;
   String text;
   int category;
@@ -20,6 +20,15 @@ class Post {
       text: json['Text'],
       category: json['Category'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'ID':id.toString(),
+      'Title':title,
+      'Text':text,
+      'Category':category.toString(),
+    };
   }
 
   @override
