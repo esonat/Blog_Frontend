@@ -5,6 +5,7 @@ import 'models/Category.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:dart_json_mapper/dart_json_mapper.dart';
+import 'package:path/path.dart';
 
 
 void main() {
@@ -34,13 +35,24 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
     //  home: const HomePage(title: 'Blog'),
-      initialRoute: '/',
+      initialRoute: '/posts',
       routes: {
         '/posts': (context) => const HomePage(title:'Blog'),
         '/createPost': (context) => const PostForm(),
       },
     );
   }
+}
+
+String? getCurrentRoute(BuildContext context){
+  var route=ModalRoute.of(context);
+
+  if(route!=null){
+    print("Current Route:"+route.settings.name!);
+    return route.settings.name;
+  }
+
+  return null;
 }
 
 class HeaderWidget extends StatelessWidget {
@@ -50,22 +62,37 @@ class HeaderWidget extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar:AppBar(
-      title: const Text('Blog'),
-      actions: <Widget>[
-        TextButton(
+      title: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: TextButton(
           child: const Text(
-            'Create Post',
-            textAlign:TextAlign.start,
-            style: TextStyle(fontSize: 18.0, color: Colors.white)),
+            'Blog',
+            style: TextStyle(fontSize: 18.0,color:Colors.white)),
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => PostForm()));
+              MaterialPageRoute(builder: (context) => HomePage(title:'Blog')));
           },
         ),
-      ],
-    ),
-  );
+      ),
+        actions: <Widget>[
+        MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: TextButton(
+            child: const Text(
+              'Create Post',
+              textAlign:TextAlign.start,
+              style: TextStyle(fontSize: 18.0, color: Colors.white)),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PostForm()));
+              },
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -86,9 +113,9 @@ Future<List<Post>?> allPosts() async {
     throw Exception("Failed to load posts");
   }
 
-  for(var i=0;i<result.length;i++){
-      print(result[i].toString());
-  }
+  // for(var i=0;i<result.length;i++){
+  //     print(result[i].toString());
+  // }
 
   return result;
 }
@@ -116,7 +143,7 @@ Future<Post>? getPost(int? id) async {
     throw Exception("Failed to load post");
   }
 
-  print(result.toString());
+  //print(result.toString());
 
   return result;
 }
@@ -134,9 +161,9 @@ Future<List<Category>> allCategories() async {
     throw Exception("Failed to load categories");
   }
 
-  for(var i=0;i<result.length;i++){
-      print(result[i].toString());
-  }
+  // for(var i=0;i<result.length;i++){
+  //     print(result[i].toString());
+  // }
 
   return result;
 }
@@ -159,11 +186,11 @@ Future<Post> addPost(Post post) async {
     }),
   );
 
-    print(jsonEncode(<String, dynamic>{
-      'Title':post.title,
-      'Text':post.text,
-      'Category':post.category
-    }));
+    // print(jsonEncode(<String, dynamic>{
+    //   'Title':post.title,
+    //   'Text':post.text,
+    //   'Category':post.category
+    // }));
     //jsonEncode(post));
 
     if (response.statusCode == 201) {
@@ -213,7 +240,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Widget postWidgetList(List<Post> posts) {
+  Widget postWidgetList(List<Post> posts,BuildContext context) {
 
     List<Widget> children=[];
     List<int> idList=[];
@@ -301,7 +328,7 @@ class _HomePageState extends State<HomePage> {
           builder: (context,snapshot) {
             if(snapshot.hasData){
 
-              return postWidgetList(snapshot.data!);
+              return postWidgetList(snapshot.data!,context);
               ///return Text(snapshot.data![0].title);
             }else if(snapshot.hasError) {
               return Text('${snapshot.error}');
@@ -568,7 +595,7 @@ class PostFormState extends State<PostForm> {
                   // ScaffoldMessenger.of(context).showSnackBar(
                   //     const SnackBar(content: Text('Processing Data')),
                   //   );
-                  print('Before post.Title:'+title+'Text:'+text+'Category:'+dropdownValue);
+                //  print('Before post.Title:'+title+'Text:'+text+'Category:'+dropdownValue);
                   Post post=Post(title:title,text:text,category:int.parse(dropdownValue));
 
                   futurePost=addPost(post);
@@ -589,28 +616,65 @@ class PostFormState extends State<PostForm> {
     );
   }
 }
- class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-   const CustomAppBar({Key? key}) : super(key: key);
+class CustomAppBar extends StatefulWidget implements PreferredSizeWidget{
+  const CustomAppBar({Key? key}) : super(key: key);
 
   @override
    Size get preferredSize => const Size.fromHeight(100);
 
+  @override
+  CustomAppBarState createState() {
+    return CustomAppBarState();
+  }
+}
+
+ class CustomAppBarState extends State<CustomAppBar>{
+  // const ({Key? key}) : super(key: key);
+
    @override
    Widget build(BuildContext context){
      return AppBar(
-       title: const Text('Blog'),
+       title: MouseRegion(
+         cursor: SystemMouseCursors.click,
+         child: TextButton(
+           child: const Text(
+             'Blog',
+             style: TextStyle(fontSize: 18.0,color:Colors.white)),
+           onPressed: () {
+             String? currentRoute=getCurrentRoute(context);
+             if(currentRoute!='/posts'){
+               Navigator.pushNamed(context,'/posts');
+             }else{
+               Navigator.pop(context);
+               Navigator.pushNamed(context,'/posts');
+             }
+             // Navigator.push(
+             //   context,
+             //   MaterialPageRoute(builder: (context) => HomePage(title:'Blog')));
+           },
+         ),
+       ),
        actions: <Widget>[
-         TextButton(
+         MouseRegion(
+           cursor: SystemMouseCursors.click,
+           child: TextButton(
            child: const Text(
              'Create Post',
              textAlign:TextAlign.start,
              style: TextStyle(fontSize: 18.0, color: Colors.white)),
            onPressed: () {
-             Navigator.push(
-               context,
-               MaterialPageRoute(builder: (context) => PostForm()));
+             String? currentRoute=getCurrentRoute(context);
+             if(currentRoute!='/createPost'){
+               Navigator.pushNamed(context,'/createPost');
+             }else{
+               setState((){});
+             }
+             // Navigator.push(
+             //   context,
+             //   MaterialPageRoute(builder: (context) => PostForm()));
            },
          ),
+       ),
        ],
      );
    }
