@@ -53,7 +53,10 @@ class HeaderWidget extends StatelessWidget {
       title: const Text('Blog'),
       actions: <Widget>[
         TextButton(
-          child: const Text('Create Post',style: TextStyle(fontSize: 18.0, color: Colors.white)),
+          child: const Text(
+            'Create Post',
+            textAlign:TextAlign.start,
+            style: TextStyle(fontSize: 18.0, color: Colors.white)),
           onPressed: () {
             Navigator.push(
               context,
@@ -201,8 +204,13 @@ class _HomePageState extends State<HomePage> {
     futurePosts=allPosts();
   }
 
+
+
   FutureOr onGoBack(dynamic value) {
-    setState((){});
+
+    setState((){
+      futurePosts=allPosts();
+    });
   }
 
   Widget postWidgetList(List<Post> posts) {
@@ -261,20 +269,29 @@ class _HomePageState extends State<HomePage> {
     // than having to individually change instances of widgets.
 
     return Scaffold(
-      appBar: AppBar(
-        //Here we take the value from the MyHomePage object that was created by
-        //the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-        actions: <Widget>[
-          TextButton(
-            child: const Text('Create Post',style: TextStyle(fontSize: 18.0, color: Colors.white)),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const PostForm()));
-            },
-          ),
-        ],
+        appBar: const CustomAppBar(
+      // appBar: AppBar(
+      //   //Here we take the value from the MyHomePage object that was created by
+      //   //the App.build method, and use it to set our appbar title.
+      //   title: Text(widget.title),
+      //   actions: <Widget>[
+      //     TextButton(
+      //       child: const Text(
+      //         'Create Post',
+      //         textAlign:TextAlign.start,
+      //         style: TextStyle(fontSize: 18.0, color: Colors.white)),
+      //       onPressed: () {
+      //         // Navigator.push(
+      //         //   context,
+      //         //   MaterialPageRoute(builder: (context) => const PostForm())).then((value) { setState(() {} );});
+      //         // },
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (context) => const PostForm())).then((value) { onGoBack(value);});
+      //         },
+      //       ),
+      //     ],
+      //       //    Navigator.push(context,MaterialPageRoute(builder: (context) => const PostForm())).then((value) { setState(() {} }));
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -361,9 +378,10 @@ class _PostDetailPageState extends State<PostDetailPage> {
     final args=ModalRoute.of(context)!.settings.arguments as IdParameter;
 
     return Scaffold(
-      appBar:AppBar(
-        title: Text('Post Detail'),
-      ),
+      // appBar:AppBar(
+      //   title: Text('Post Detail'),
+      // ),
+      appBar: CustomAppBar(),
       body: Center(
         child: FutureBuilder<Post>(
           future: getPost(args.id),
@@ -458,6 +476,7 @@ class PostFormState extends State<PostForm> {
     String categoryID='1';
 
     return Scaffold(
+      appBar: CustomAppBar(),
       body: Form(
       key: _formKey,
       child: Container(
@@ -569,4 +588,30 @@ class PostFormState extends State<PostForm> {
     ),
     );
   }
+}
+ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+   const CustomAppBar({Key? key}) : super(key: key);
+
+  @override
+   Size get preferredSize => const Size.fromHeight(100);
+
+   @override
+   Widget build(BuildContext context){
+     return AppBar(
+       title: const Text('Blog'),
+       actions: <Widget>[
+         TextButton(
+           child: const Text(
+             'Create Post',
+             textAlign:TextAlign.start,
+             style: TextStyle(fontSize: 18.0, color: Colors.white)),
+           onPressed: () {
+             Navigator.push(
+               context,
+               MaterialPageRoute(builder: (context) => PostForm()));
+           },
+         ),
+       ],
+     );
+   }
 }
