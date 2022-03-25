@@ -1,10 +1,10 @@
 class Category {
   Category({
-    required this.id,
+    this.id,
     required this.name
   });
 
-  int id;
+  int? id;
   String name;
 
   factory Category.fromJson(Map<String,dynamic> json) {
@@ -12,6 +12,13 @@ class Category {
       id: json['ID'],
       name: json['Name'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'ID':id.toString(),
+      'Name':name,
+    };
   }
 
   @override

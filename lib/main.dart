@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:path/path.dart';
-
+import 'auth/Registration.dart';
+import 'util/CustomAppBar.dart';
 
 void main() {
   runApp(const MyApp());
@@ -39,6 +40,8 @@ class MyApp extends StatelessWidget {
       routes: {
         '/posts': (context) => const HomePage(title:'Blog'),
         '/createPost': (context) => const PostForm(),
+        '/createCategory': (context) => const CategoryForm(),
+        '/registration': (context) => RegistrationForm(),
       },
     );
   }
@@ -168,11 +171,41 @@ Future<List<Category>> allCategories() async {
   return result;
 }
 
+Future<Category> addCategory(Category category) async {
+  // Map<String, String> requestHeaders = {
+  //   "Access-Control-Allow-Origin":"*",
+  // };
+  //Map<String,dynamic> jsonBody={"ID":"5","Title":"title","Text":"text","Category":"1"};
+
+  final response = await http.post(
+    Uri.parse('http://localhost:8080/categories'),
+    // headers: <String, String>{
+    //   'Content-Type': 'application/json; charset=UTF-8',
+    // },
+    body: jsonEncode(<String, dynamic>{
+      'Name':category.name
+    }),
+  );
+
+    // print(jsonEncode(<String, dynamic>{
+    //   'Title':post.title,
+    //   'Text':post.text,
+    //   'Category':post.category
+    // }));
+    //jsonEncode(post));
+
+    if (response.statusCode == 201) {
+      return Category.fromJson(jsonDecode(response.body));
+    }else {
+      throw Exception("Failed to add category");
+    }
+  }
+
 Future<Post> addPost(Post post) async {
   // Map<String, String> requestHeaders = {
   //   "Access-Control-Allow-Origin":"*",
   // };
-  Map<String,dynamic> jsonBody={"ID":"5","Title":"title","Text":"text","Category":"1"};
+  //Map<String,dynamic> jsonBody={"ID":"5","Title":"title","Text":"text","Category":"1"};
 
   final response = await http.post(
     Uri.parse('http://localhost:8080/posts'),
@@ -616,66 +649,134 @@ class PostFormState extends State<PostForm> {
     );
   }
 }
-class CustomAppBar extends StatefulWidget implements PreferredSizeWidget{
-  const CustomAppBar({Key? key}) : super(key: key);
+
+
+class CategoryForm extends StatefulWidget {
+  const CategoryForm({Key? key}) : super(key: key);
 
   @override
-   Size get preferredSize => const Size.fromHeight(100);
-
-  @override
-  CustomAppBarState createState() {
-    return CustomAppBarState();
+  CategoryFormState createState() {
+    return CategoryFormState();
   }
 }
 
- class CustomAppBarState extends State<CustomAppBar>{
-  // const ({Key? key}) : super(key: key);
+class CategoryFormState extends State<CategoryForm> {
+  final _formKey=GlobalKey<FormState>();
 
-   @override
-   Widget build(BuildContext context){
-     return AppBar(
-       title: MouseRegion(
-         cursor: SystemMouseCursors.click,
-         child: TextButton(
-           child: const Text(
-             'Blog',
-             style: TextStyle(fontSize: 18.0,color:Colors.white)),
-           onPressed: () {
-             String? currentRoute=getCurrentRoute(context);
-             if(currentRoute!='/posts'){
-               Navigator.pushNamed(context,'/posts');
-             }else{
-               Navigator.pop(context);
-               Navigator.pushNamed(context,'/posts');
-             }
-             // Navigator.push(
-             //   context,
-             //   MaterialPageRoute(builder: (context) => HomePage(title:'Blog')));
-           },
-         ),
-       ),
-       actions: <Widget>[
-         MouseRegion(
-           cursor: SystemMouseCursors.click,
-           child: TextButton(
-           child: const Text(
-             'Create Post',
-             textAlign:TextAlign.start,
-             style: TextStyle(fontSize: 18.0, color: Colors.white)),
-           onPressed: () {
-             String? currentRoute=getCurrentRoute(context);
-             if(currentRoute!='/createPost'){
-               Navigator.pushNamed(context,'/createPost');
-             }else{
-               setState((){});
-             }
-             // Navigator.push(
-             //   context,
-             //   MaterialPageRoute(builder: (context) => PostForm()));
-           },
-         ),
-       ),
-       ],
-     );
-   }
+  String dropdownValue='1';
+
+  // Future<List<DropdownMenuItem<String>>> categoryNames() async {
+  //   List<Category> categories=await allCategories();
+  //   List<DropdownMenuItem<String>> list=[];
+  //   List<String> names=[];
+  //
+  //   if(categories!=null){
+  //     for(var i=0;i<categories.length;i++) {
+  //       list.add(DropdownMenuItem<String>(
+  //         value:categories[i].id.toString(),
+  //         child:Text(categories[i].name),
+  //       ));
+  //
+  //       names.add(categories[i].name);
+  //     }
+  //   }
+  //
+  //   return list;
+  //
+  //
+  //   //
+  //   // items: <String>['One', 'Two', 'Free', 'Four']
+  //   //     .map<DropdownMenuItem<String>>((String value) {
+  //   //   return DropdownMenuItem<String>(
+  //   //     value: value,
+  //   //     child: Text(value),
+  //   //   );
+  //   // }).toList(),
+  //     // return names.map<DropdownMenuItem<String>>((String value){
+  //     //   return DropdownMenuItem<String>(
+  //     //     value: value,
+  //     //     child: Text(value),
+  //     //   );
+  //     // }).toList();
+  // }
+  //
+
+
+  //late Future<List<DropdownMenuItem<String>>> futureCategories;
+  late Future<Category> futureCategory;
+
+  @override
+  void initState() {
+    super.initState();
+    //futureCategories=categoryNames();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // String title='title';
+    // String text='text';
+    // String categoryID='1';
+    String name='name';
+
+    return Scaffold(
+      appBar: CustomAppBar(),
+      body: Form(
+      key: _formKey,
+      child: Container(
+        width:500,
+        child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Name'),
+          TextFormField(
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter name';
+              }
+              name=value;
+
+              return null;
+            },
+            onFieldSubmitted: (value) {
+              setState(() {
+                name=value;
+              });
+            },
+            onChanged: (String? value){
+              setState(() {
+                name=value!;
+              });
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: ElevatedButton(
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  // ScaffoldMessenger.of(context).showSnackBar(
+                  //     const SnackBar(content: Text('Processing Data')),
+                  //   );
+                //  print('Before post.Title:'+title+'Text:'+text+'Category:'+dropdownValue);
+                  Category category=Category(name:name);
+
+                  futureCategory=addCategory(category);
+                  print('Added category with name:'+name);
+
+
+                  Navigator.pop(context);
+
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) => const HomePage(title:'Blog')));
+                }
+              },
+              child: const Text('Submit'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+    );
+  }
 }
