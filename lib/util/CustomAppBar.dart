@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../screens/login_page.dart';
+import 'fire_auth.dart';
 
 String? getCurrentRoute(BuildContext context){
   var route=ModalRoute.of(context);
@@ -24,9 +27,17 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget{
 
  class CustomAppBarState extends State<CustomAppBar>{
   // const ({Key? key}) : super(key: key);
+  bool _userLoggedIn=false;
 
    @override
    Widget build(BuildContext context){
+     User? user=FirebaseAuth.instance.currentUser;
+    if(user != null){
+      setState((){
+        _userLoggedIn=true;
+      });
+     }
+
      return AppBar(
        title: MouseRegion(
          cursor: SystemMouseCursors.click,
@@ -48,7 +59,8 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget{
            },
          ),
        ),
-       actions: <Widget>[
+       actions: [
+       //actions: <Widget>[
          MouseRegion(
            cursor: SystemMouseCursors.click,
            child: TextButton(
@@ -91,6 +103,41 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget{
          },
         ),
        ),
+       _userLoggedIn
+          ? null
+          : MouseRegion(
+         cursor: SystemMouseCursors.click,
+         child: TextButton(
+           child: const Text(
+             'Sign Out',
+             textAlign:TextAlign.start,
+             style: TextStyle(fontSize: 18.0, color: Colors.white)),
+           onPressed: () async {
+              User user=FirebaseAuth.instance.currentUser!;
+              if (user != null) {
+                await FirebaseAuth.instance.signOut();
+              }
+              // FireAuth.signOut(user
+
+               Navigator.of(context).pushReplacement(
+                 MaterialPageRoute(
+                   builder: (context) => LoginPage(),
+                 ),
+               );
+             // String? currentRoute=getCurrentRoute(context);
+             // if(currentRoute!='/createCategory'){
+             //   Navigator.pushNamed(context,'/createCategory');
+             // }else{
+             //   Navigator.pop(context);
+             //   Navigator.pushNamed(context,'/createCategory');
+             // }
+           // Navigator.push(
+           //   context,
+           //   MaterialPageRoute(builder: (context) => PostForm()));
+         },
+        ),
+      ),
+
      //   MouseRegion(
      //     cursor: SystemMouseCursors.click,
      //     child: TextButton(

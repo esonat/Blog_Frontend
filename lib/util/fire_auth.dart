@@ -64,4 +64,15 @@ class FireAuth {
 
         return refreshedUser;
       }
+
+      static Future<User?> signOut(User user) async {
+        FirebaseAuth auth = FirebaseAuth.instance;
+
+        await auth.signOut();
+
+        await user.reload();
+        User? refreshedUser = auth.currentUser;
+
+        return refreshedUser;
+      }
     }
