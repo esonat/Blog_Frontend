@@ -3,7 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
-    
+
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
 /// Example:
@@ -57,11 +57,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyApE5BjEdZ1QgWDfq2UJuFLafKEYkWQ1ng',
-    appId: '1:335040073706:ios:7b47744110ae310e5dec93',
+    appId: '1:335040073706:ios:8899ce7b113f57645dec93',
     messagingSenderId: '335040073706',
     projectId: 'blog-app-db767',
     storageBucket: 'blog-app-db767.appspot.com',
-    iosClientId: '335040073706-18237o134g360105ec23bdvudte6jigv.apps.googleusercontent.com',
-    iosBundleId: 'com.exampl',
+    iosClientId: '335040073706-88vf2fffpamv5s304bq5b6cqe7n8s8bg.apps.googleusercontent.com',
+    iosBundleId: 'com.example.blog',
   );
 }

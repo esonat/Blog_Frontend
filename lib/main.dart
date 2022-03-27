@@ -6,17 +6,23 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:path/path.dart';
-import 'auth/Registration.dart';
+//import 'auth/Registration.dart';
 import 'util/CustomAppBar.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // new
 import 'package:firebase_core/firebase_core.dart'; // new
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';           // new
-
+import '../screens/login_page.dart';
+import '../screens/profile_page.dart';
+import '../screens/register_page.dart';
 import 'firebase_options.dart';                    // new
 
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -27,7 +33,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home:const HomePage(title:'Blog'),
+      debugShowCheckedModeBanner: false,
+      home: LoginPage(),
+      //home:const HomePage(title:'Blog'),
       //  body: const HomePage(title: 'Blog'),
       title: 'Blog',
       theme: ThemeData(
@@ -48,10 +56,23 @@ class MyApp extends StatelessWidget {
         '/posts': (context) => const HomePage(title:'Blog'),
         '/createPost': (context) => const PostForm(),
         '/createCategory': (context) => const CategoryForm(),
+        '/login': (context) => LoginPage(),
+        '/register': (context) => RegisterPage(),
       },
     );
   }
 }
+//
+// class LoginPage extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Blog'),
+//       ),
+//     );
+//   }
+// }
 
 String? getCurrentRoute(BuildContext context){
   var route=ModalRoute.of(context);
@@ -770,6 +791,7 @@ class CategoryFormState extends State<CategoryForm> {
 
 
                   Navigator.pop(context);
+                  Navigator.pushNamed(context,'/posts');
 
                   // Navigator.push(
                   //   context,

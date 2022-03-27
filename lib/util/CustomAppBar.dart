@@ -61,7 +61,8 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget{
              if(currentRoute!='/createPost'){
                Navigator.pushNamed(context,'/createPost');
              }else{
-               setState((){});
+               Navigator.pop(context);
+               Navigator.pushNamed(context,'/createPost');
              }
              // Navigator.push(
              //   context,
@@ -81,7 +82,8 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget{
            if(currentRoute!='/createCategory'){
              Navigator.pushNamed(context,'/createCategory');
            }else{
-             setState((){});
+             Navigator.pop(context);
+             Navigator.pushNamed(context,'/createCategory');
            }
            // Navigator.push(
            //   context,
@@ -89,26 +91,26 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget{
          },
         ),
        ),
-       MouseRegion(
-         cursor: SystemMouseCursors.click,
-         child: TextButton(
-         child: const Text(
-           'Registration',
-           textAlign:TextAlign.start,
-           style: TextStyle(fontSize: 18.0, color: Colors.white)),
-         onPressed: () {
-           String? currentRoute=getCurrentRoute(context);
-           if(currentRoute!='/registration'){
-             Navigator.pushNamed(context,'/registration');
-           }else{
-             setState((){});
-           }
-           // Navigator.push(
-           //   context,
-           //   MaterialPageRoute(builder: (context) => PostForm()));
-         },
-       ),
-     ),
+     //   MouseRegion(
+     //     cursor: SystemMouseCursors.click,
+     //     child: TextButton(
+     //     child: const Text(
+     //       'Registration',
+     //       textAlign:TextAlign.start,
+     //       style: TextStyle(fontSize: 18.0, color: Colors.white)),
+     //     onPressed: () {
+     //       String? currentRoute=getCurrentRoute(context);
+     //       if(currentRoute!='/registration'){
+     //         Navigator.pushNamed(context,'/registration');
+     //       }else{
+     //         setState((){});
+     //       }
+     //       // Navigator.push(
+     //       //   context,
+     //       //   MaterialPageRoute(builder: (context) => PostForm()));
+     //     },
+     //   ),
+     // ),
        ],
      );
    }
