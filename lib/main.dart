@@ -8,6 +8,13 @@ import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:path/path.dart';
 import 'auth/Registration.dart';
 import 'util/CustomAppBar.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // new
+import 'package:firebase_core/firebase_core.dart'; // new
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';           // new
+
+import 'firebase_options.dart';                    // new
+
 
 void main() {
   runApp(const MyApp());
@@ -41,7 +48,6 @@ class MyApp extends StatelessWidget {
         '/posts': (context) => const HomePage(title:'Blog'),
         '/createPost': (context) => const PostForm(),
         '/createCategory': (context) => const CategoryForm(),
-        '/registration': (context) => RegistrationForm(),
       },
     );
   }
@@ -354,27 +360,27 @@ class _HomePageState extends State<HomePage> {
       //       //    Navigator.push(context,MaterialPageRoute(builder: (context) => const PostForm())).then((value) { setState(() {} }));
       ),
       body: SingleChildScrollView(
-        child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: FutureBuilder<List<Post>?>(
-          future: futurePosts,
-          builder: (context,snapshot) {
-            if(snapshot.hasData){
+          child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: FutureBuilder<List<Post>?>(
+                  future: futurePosts,
+                  builder: (context,snapshot) {
+                    if(snapshot.hasData){
 
-              return postWidgetList(snapshot.data!,context);
-              ///return Text(snapshot.data![0].title);
-            }else if(snapshot.hasError) {
-              return Text('${snapshot.error}');
-            }
+                      return postWidgetList(snapshot.data!,context);
+                      ///return Text(snapshot.data![0].title);
+                    }else if(snapshot.hasError) {
+                      return Text('${snapshot.error}');
+                    }
 
-            return const CircularProgressIndicator();
-          },
-        ),
-      ),
-    ),
-    );
-  }
-}
+                      return const CircularProgressIndicator();
+                    },
+                  ),
+                ),
+              ),
+          );
+      }
+    }
 
 class PostDetailPage extends StatefulWidget {
   const PostDetailPage({Key? key}) : super(key: key);
