@@ -6,6 +6,7 @@ import 'register_page.dart';
 import '../util/fire_auth.dart';
 import '../util/validator.dart';
 import '../util/CustomAppBar.dart';
+import '../main.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -29,13 +30,13 @@ class _LoginPageState extends State<LoginPage> {
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => ProfilePage(
-            user: user,
-          ),
-        ),
-      );
+      Navigator.of(context).pushNamed('/posts');
+      // Navigator.of(context).pushReplacement(
+      //   MaterialPageRoute(
+      //     builder: (context) => ProfilePage(
+      //       user: user,
+      //     ),
+      //   );
     }
 
     return firebaseApp;
@@ -51,8 +52,8 @@ class _LoginPageState extends State<LoginPage> {
       child: Scaffold(
         appBar: CustomAppBar(
 
-          //title: Text('Firebase Authentication'),
-        ),
+            //title: Text('Firebase Authentication'),
+            ),
         body: FutureBuilder(
           future: _initializeFirebase(),
           builder: (context, snapshot) {
@@ -139,12 +140,15 @@ class _LoginPageState extends State<LoginPage> {
 
                                             if (user != null) {
                                               Navigator.of(context)
-                                                  .pushReplacement(
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ProfilePage(user: user),
-                                                ),
-                                              );
+                                                  .pushNamed('/posts');
+                                              // Navigator.of(context)
+                                              //     .pushReplacement(
+                                              //   MaterialPageRoute(
+                                              //     builder: (context) =>
+                                              //           const HomePage(title:'Blog'),
+                                              //       //  ProfilePage(user: user),
+                                              //   ),
+                                              // );
                                             }
                                           }
                                         },

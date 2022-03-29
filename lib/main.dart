@@ -32,6 +32,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: LoginPage(),
@@ -51,12 +53,13 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
     //  home: const HomePage(title: 'Blog'),
-      initialRoute: '/posts',
+      initialRoute: '/login',
       routes: {
         '/posts': (context) => const HomePage(title:'Blog'),
         '/createPost': (context) => const PostForm(),
         '/createCategory': (context) => const CategoryForm(),
         '/login': (context) => LoginPage(),
+        '/profile': (context) => ProfilePage(user: currentUser!),
         '/register': (context) => RegisterPage(),
       },
     );
@@ -83,47 +86,6 @@ String? getCurrentRoute(BuildContext context){
   }
 
   return null;
-}
-
-class HeaderWidget extends StatelessWidget {
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar:AppBar(
-      title: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: TextButton(
-          child: const Text(
-            'Blog',
-            style: TextStyle(fontSize: 18.0,color:Colors.white)),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => HomePage(title:'Blog')));
-          },
-        ),
-      ),
-        actions: <Widget>[
-        MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: TextButton(
-            child: const Text(
-              'Create Post',
-              textAlign:TextAlign.start,
-              style: TextStyle(fontSize: 18.0, color: Colors.white)),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => PostForm()));
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 Future<List<Post>?> allPosts() async {
@@ -280,6 +242,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late Future<List<Post>?> futurePosts;
+
+  User? user;
   // handlePosts(List<Post> content){
   //   for(var i=0;i<content.length;i++){
   //     print(content[i].toString());
@@ -289,6 +253,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     futurePosts=allPosts();
+    user=FirebaseAuth.instance.currentUser;
   }
 
 
@@ -302,6 +267,14 @@ class _HomePageState extends State<HomePage> {
 
   Widget postWidgetList(List<Post> posts,BuildContext context) {
 
+      User? user=FirebaseAuth.instance.currentUser;
+      if (user == null){
+        print('No one signed in');
+      }else{
+        print('Current user:'+user.email!);
+      }
+
+
     List<Widget> children=[];
     List<int> idList=[];
 
@@ -314,7 +287,7 @@ class _HomePageState extends State<HomePage> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => PostDetailPage(),
+                    MaterialPageRoute(builder: (context) => const PostDetailPage(),
 
 
                     settings: RouteSettings(
@@ -323,7 +296,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ).then(onGoBack);
                 },
-                child: Text(posts[i].title,style:TextStyle(fontSize:18.0,fontWeight:FontWeight.w700)))
+                child: Text(posts[i].title,style:const TextStyle(fontSize:18.0,fontWeight:FontWeight.w700)))
              ),
           ],
         ),
@@ -332,12 +305,12 @@ class _HomePageState extends State<HomePage> {
       children.add(
         Row(
           children: [
-            Expanded(child: Text(posts[i].text,style:TextStyle(fontSize:12.0))),
+            Expanded(child: Text(posts[i].text,style:const TextStyle(fontSize:12.0))),
           ],
         ),
       );
 
-      children.add(SizedBox(height:50));
+      children.add(const SizedBox(height:50));
     }
     return Container(
       width:500,
@@ -354,6 +327,9 @@ class _HomePageState extends State<HomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+    if (user == null) {
+      return LoginPage();
+    }
 
     return Scaffold(
         appBar: const CustomAppBar(
@@ -423,11 +399,13 @@ class PostDetailPage extends StatefulWidget {
 class _PostDetailPageState extends State<PostDetailPage> {
 
   late Future<Post> futurePost;
+  User? user;
   //int id=0;
 
   @override
   void initState() {
     super.initState();
+    user=FirebaseAuth.instance.currentUser;
 
   }
 
@@ -439,14 +417,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
         children: [
             Row(children: [
               Expanded(
-                child: Text(post.title,style:TextStyle(fontSize:18.0,fontWeight:FontWeight.w700))
+                child: Text(post.title,style:const TextStyle(fontSize:18.0,fontWeight:FontWeight.w700))
               ),
             ],
           ),
           const SizedBox(height:50),
             Row(children: [
               Expanded(
-                child: Text(post.text,style:TextStyle(fontSize:14.0,fontWeight:FontWeight.w300)),
+                child: Text(post.text,style:const TextStyle(fontSize:14.0,fontWeight:FontWeight.w300)),
                 ),
               ],
             ),
@@ -468,7 +446,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
       // appBar:AppBar(
       //   title: Text('Post Detail'),
       // ),
-      appBar: CustomAppBar(),
+      appBar: const CustomAppBar(),
       body: Center(
         child: FutureBuilder<Post>(
           future: getPost(args.id),
@@ -509,6 +487,8 @@ class PostFormState extends State<PostForm> {
   final _formKey=GlobalKey<FormState>();
 
   String dropdownValue='1';
+
+  User? user;
 
   Future<List<DropdownMenuItem<String>>> categoryNames() async {
     List<Category> categories=await allCategories();
@@ -554,6 +534,7 @@ class PostFormState extends State<PostForm> {
   void initState() {
     super.initState();
     futureCategories=categoryNames();
+    user=FirebaseAuth.instance.currentUser;
   }
 
   @override
@@ -562,8 +543,12 @@ class PostFormState extends State<PostForm> {
     String text='text';
     String categoryID='1';
 
+    if (user == null) {
+      return LoginPage();
+    }
+
     return Scaffold(
-      appBar: CustomAppBar(),
+      appBar: const CustomAppBar(),
       body: Form(
       key: _formKey,
       child: Container(
@@ -661,6 +646,7 @@ class PostFormState extends State<PostForm> {
                   futurePost=addPost(post);
                   print('Added post with title:'+title);
                   Navigator.pop(context);
+                  Navigator.of(context).pushNamed('/posts');
                   // Navigator.push(
                   //   context,
                   //   MaterialPageRoute(builder: (context) => const HomePage(title:'Blog')));
@@ -692,6 +678,7 @@ class CategoryFormState extends State<CategoryForm> {
 
   String dropdownValue='1';
 
+  User? user;
   // Future<List<DropdownMenuItem<String>>> categoryNames() async {
   //   List<Category> categories=await allCategories();
   //   List<DropdownMenuItem<String>> list=[];
@@ -735,6 +722,7 @@ class CategoryFormState extends State<CategoryForm> {
   @override
   void initState() {
     super.initState();
+    user=FirebaseAuth.instance.currentUser;
     //futureCategories=categoryNames();
   }
 
@@ -745,8 +733,12 @@ class CategoryFormState extends State<CategoryForm> {
     // String categoryID='1';
     String name='name';
 
+    if (user == null) {
+      return LoginPage();
+    }
+
     return Scaffold(
-      appBar: CustomAppBar(),
+      appBar: const CustomAppBar(),
       body: Form(
       key: _formKey,
       child: Container(

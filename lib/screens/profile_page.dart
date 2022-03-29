@@ -19,14 +19,22 @@ class _ProfilePageState extends State<ProfilePage> {
 
   late User _currentUser;
 
+  User? user;
+
   @override
   void initState() {
     _currentUser = widget.user;
     super.initState();
+    user=FirebaseAuth.instance.currentUser;
   }
 
   @override
   Widget build(BuildContext context) {
+
+    if (user == null) {
+      return LoginPage();
+    }
+
     return Scaffold(
       appBar: CustomAppBar(),
       // appBar: AppBar(
