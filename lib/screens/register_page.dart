@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-
+import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
 import 'profile_page.dart';
 import '../util/fire_auth.dart';
 import '../util/validator.dart';
+import '../models/BlogUser.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -16,10 +18,12 @@ class _RegisterPageState extends State<RegisterPage> {
   final _nameTextController = TextEditingController();
   final _emailTextController = TextEditingController();
   final _passwordTextController = TextEditingController();
+  final _imagePathTextController = TextEditingController();
 
   final _focusName = FocusNode();
   final _focusEmail = FocusNode();
   final _focusPassword = FocusNode();
+  final _focusImagePath = FocusNode();
 
   bool _isProcessing = false;
 
@@ -30,6 +34,7 @@ class _RegisterPageState extends State<RegisterPage> {
         _focusName.unfocus();
         _focusEmail.unfocus();
         _focusPassword.unfocus();
+        _focusImagePath.unfocus();
       },
       child: Scaffold(
         appBar: AppBar(
@@ -97,6 +102,22 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                       SizedBox(height: 32.0),
+                      TextFormField(
+                        controller: _imagePathTextController,
+                        focusNode: _focusImagePath,
+                        validator: (value) => Validator.validateImagePath(
+                          imagePath: value,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: "Image Path",
+                          errorBorder: UnderlineInputBorder(
+                            borderRadius: BorderRadius.circular(6.0),
+                            borderSide: BorderSide(
+                              color: Colors.red,
+                            ),
+                          ),
+                        ),
+                      ),
                       _isProcessing
                           ? CircularProgressIndicator()
                           : Row(
@@ -123,6 +144,32 @@ class _RegisterPageState extends State<RegisterPage> {
                                         });
 
                                         if (user != null) {
+                                          final response = await http.post(
+                                            Uri.parse(
+                                                'http://localhost:8080/users'),
+                                            // headers: <String, String>{
+                                            //   'Content-Type': 'application/json; charset=UTF-8',
+                                            // },
+                                            body: jsonEncode(<String, dynamic>{
+                                              'Username':
+                                                  _nameTextController.text,
+                                              'ImagePath':
+                                                  _imagePathTextController.text,
+                                            }),
+                                          );
+
+                                          // print(jsonEncode(<String, dynamic>{
+                                          //   'Title':post.title,
+                                          //   'Text':post.text,
+                                          //   'Category':post.category
+                                          // }));
+                                          //jsonEncode(post));
+
+                                          if (response.statusCode != 201) {
+                                            throw Exception(
+                                                "Failed to add user");
+                                          }
+
                                           Navigator.of(context)
                                               .pushAndRemoveUntil(
                                             MaterialPageRoute(

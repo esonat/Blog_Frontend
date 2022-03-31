@@ -41,4 +41,21 @@ class Validator {
 
     return null;
   }
+
+  static String? validateImagePath({required String? imagePath}) {
+    if (imagePath == null) {
+      return null;
+    }
+
+    RegExp imagePathRegExp = RegExp(
+        r"(http|ftp|https)://[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:/~+#-]*[\w@?^=%&amp;/~+#-])?");
+
+    if (imagePath.isEmpty) {
+      return 'Image path can\'t be empty';
+    } else if (!imagePathRegExp.hasMatch(imagePath)) {
+      return 'Enter a correct url';
+    }
+
+    return null;
+  }
 }
