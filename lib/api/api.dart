@@ -94,7 +94,7 @@ Future<Post>? getPost(int? id) async {
   return result;
 }
 
-Future<List<Post>?> allPosts() async {
+Future<List<Post>> allPosts() async {
   // Map<String, String> requestHeaders = {
   //   "Access-Control-Allow-Origin":"*",
   // };
@@ -106,6 +106,7 @@ Future<List<Post>?> allPosts() async {
   if (response.statusCode == 200) {
     for (var i = 0; i < posts.length; i++) {
       result.add(Post.fromJson(posts[i]));
+      print(Post.fromJson(posts[i]).toString());
     }
   } else {
     throw Exception("Failed to load posts");
@@ -189,6 +190,37 @@ Future<BlogUser>? getBlogUserByUsername(String username) async {
       .get(Uri.parse('http://localhost:8080/users/username/' + username));
   dynamic blogUser = await json.decode(response.body) as dynamic;
   BlogUser? result;
+
+  // if(response.statusCode == 200) {
+  //   for(var i=0;i<posts.length;i++) {
+  //     result.add(Post.fromJson(posts[i]));
+  //   }
+  // }else {
+  //   throw Exception("Failed to load posts");
+  // }
+
+  if (response.statusCode == 200) {
+    result = BlogUser.fromJson(blogUser);
+  } else {
+    throw Exception("Failed to load blogUser");
+  }
+
+  //print(result.toString());
+
+  return result;
+}
+
+Future<BlogUser>? getBlogUserById(int id) async {
+  Map<String, String> requestHeaders = {
+    "Access-Control-Allow-Origin": "*",
+  };
+
+  final response =
+      await http.get(Uri.parse('http://localhost:8080/users/' + id.toString()));
+  dynamic blogUser = await json.decode(response.body) as dynamic;
+  BlogUser? result;
+
+  print("getBlogUserById Id:" + id.toString());
 
   // if(response.statusCode == 200) {
   //   for(var i=0;i<posts.length;i++) {

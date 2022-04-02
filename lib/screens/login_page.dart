@@ -44,17 +44,21 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        _focusEmail.unfocus();
-        _focusPassword.unfocus();
-      },
-      child: Scaffold(
-        appBar: CustomAppBar(
-
-            //title: Text('Firebase Authentication'),
-            ),
-        body: FutureBuilder(
+    // return GestureDetector(
+    //   onTap: () {
+    //     _focusEmail.unfocus();
+    //     _focusPassword.unfocus();
+    //   },
+    return Scaffold(
+      appBar: CustomAppBar(
+          //title: Text('Firebase Authentication'),
+          ),
+      body: GestureDetector(
+        onTap: () {
+          _focusEmail.unfocus();
+          _focusPassword.unfocus();
+        },
+        child: FutureBuilder(
           future: _initializeFirebase(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {

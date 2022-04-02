@@ -21,6 +21,7 @@ import '../util/arguments.dart';
 class PostDetailPage extends StatefulWidget {
   const PostDetailPage({Key? key}) : super(key: key);
 
+  static const routeName = '/postdetail';
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
   // how it looks.
@@ -69,6 +70,48 @@ class _PostDetailPageState extends State<PostDetailPage> {
               ),
             ],
           ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: Text(user!.displayName!,
+                    style:
+                        TextStyle(fontSize: 12.0, fontWeight: FontWeight.w300)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 5),
+          Row(children: [
+            Expanded(
+              child: FutureBuilder<BlogUser>(
+                future: getBlogUserByUsername(user!.displayName!),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    BlogUser blogUser = snapshot.data as BlogUser;
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                              width: 50.0,
+                              height: 50.0,
+                              child:
+                                  Image(image: AssetImage(blogUser.imagePath))),
+                        ),
+                      ],
+                    );
+                  } else if (snapshot.hasError) {
+                    return Text('${snapshot.error}');
+                  }
+                  //   return Text(blogUser!.username);
+                  // } else if (snapshot.hasError) {
+                  //   return Text('${snapshot.error}');
+                  // }
+
+                  return const CircularProgressIndicator();
+                },
+              ),
+            )
+          ])
         ],
       ),
     );
@@ -82,6 +125,10 @@ class _PostDetailPageState extends State<PostDetailPage> {
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as IdParameter;
+
+    if (user == null) {
+      return LoginPage();
+    }
 
     return Scaffold(
       // appBar:AppBar(

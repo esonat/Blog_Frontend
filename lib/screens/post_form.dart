@@ -177,6 +177,7 @@ class PostFormState extends State<PostForm> {
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     blogUser = snapshot.data as BlogUser;
+                    return Text('${blogUser!.username}');
                   } else if (snapshot.hasError) {
                     return Text('${snapshot.error}');
                   }

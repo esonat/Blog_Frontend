@@ -32,6 +32,9 @@ Widget header_link(BuildContext context, String text) {
     case 'Login':
       route = '/login';
       break;
+    default:
+      route = '/postdetail';
+      break;
   }
 
   return MouseRegion(
@@ -42,6 +45,7 @@ Widget header_link(BuildContext context, String text) {
           style: TextStyle(fontSize: 18.0, color: Colors.white)),
       onPressed: () {
         String? currentRoute = getCurrentRoute(context);
+
         if (currentRoute != route) {
           Navigator.pushNamed(context, route);
         } else {

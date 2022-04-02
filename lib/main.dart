@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:blog/screens/post_detail_page.dart';
+
 import 'models/Post.dart';
 import 'models/Category.dart';
 import 'models/BlogUser.dart';
@@ -59,6 +61,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/login',
       routes: {
         '/posts': (context) => const HomePage(title: 'Blog'),
+        '/postdetail': (context) => const PostDetailPage(),
         '/createPost': (context) => const PostForm(),
         '/createCategory': (context) => const CategoryForm(),
         '/login': (context) => LoginPage(),

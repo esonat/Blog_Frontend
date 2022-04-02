@@ -37,7 +37,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late Future<List<Post>?> futurePosts;
+  late Future<List<Post>> futurePosts;
 
   User? user;
   // handlePosts(List<Post> content){
@@ -59,11 +59,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget postWidgetList(List<Post> posts, BuildContext context) {
-    User? user = FirebaseAuth.instance.currentUser;
+    user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       print('No one signed in');
     } else {
-      print('Current user:' + user.email!);
+      print('Current user:' + user!.email!);
     }
 
     List<Widget> children = [];
@@ -77,16 +77,21 @@ class _HomePageState extends State<HomePage> {
             Expanded(
                 child: GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const PostDetailPage(),
-                          settings: RouteSettings(
-                            arguments: IdParameter(posts[i].id),
-                          ),
-                        ),
-                      ).then(onGoBack);
+                      Navigator.pushNamed(context, PostDetailPage.routeName,
+                              arguments: IdParameter(posts[i].id))
+                          .then(onGoBack);
                     },
+                    // onTap: () {
+                    //   Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //       builder: (context) => const PostDetailPage(),
+                    //       settings: RouteSettings(
+                    //         arguments: IdParameter(posts[i].id),
+                    //       ),
+                    //     ),
+                    //   ).then(onGoBack);
+                    // },
                     child: Text(posts[i].title,
                         style: const TextStyle(
                             fontSize: 18.0, fontWeight: FontWeight.w700)))),
@@ -99,38 +104,67 @@ class _HomePageState extends State<HomePage> {
           children: [
             Expanded(
                 child: Text(posts[i].text,
-                    style: const TextStyle(fontSize: 12.0))),
+                    style: const TextStyle(fontSize: 15.0))),
           ],
         ),
       );
 
-      children.add(Row(
-        children: [
-          FutureBuilder<BlogUser>(
-            future: getBlogUser(posts[i].blogUser),
+      children.add(
+        FutureBuilder<BlogUser>(
+          future: getBlogUserById(posts[i].blogUser),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              print("BlogUser:" + blogUser.toString());
+              blogUser = snapshot.data as BlogUser;
+              return Text(blogUser!.username);
+            } else if (snapshot.hasError) {
+              return Text('${snapshot.error}');
+            }
+
+            return const CircularProgressIndicator();
+          },
+        ),
+      );
+
+      children.add(Row(children: [
+        Expanded(
+          child: FutureBuilder<BlogUser>(
+            future: getBlogUserById(posts[i].blogUser),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                //return postWidget(snapshot.data!);
-                blogUser = snapshot.data!;
-
-                ///return Text(snapshot.data![0].title);
+                print("BlogUser:" + blogUser.toString());
+                blogUser = snapshot.data as BlogUser;
+                return Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                          width: 50.0,
+                          height: 50.0,
+                          child: Image(image: AssetImage(blogUser!.imagePath))),
+                    ),
+                  ],
+                );
               } else if (snapshot.hasError) {
                 return Text('${snapshot.error}');
               }
+              //   return Text(blogUser!.username);
+              // } else if (snapshot.hasError) {
+              //   return Text('${snapshot.error}');
+              // }
 
               return const CircularProgressIndicator();
             },
           ),
-        ],
-      ));
+        )
+      ]));
 
-      children.add(
-        Row(
-          children: [
-            Expanded(child: Image.network(blogUser!.imagePath)),
-          ],
-        ),
-      );
+      // children.add(
+      //   Row(
+      //     children: [
+      //       Expanded(child: Image.network(blogUser!.imagePath)),
+      //     ],
+      //   ),
+      // );
 
       children.add(const SizedBox(height: 50));
     }
@@ -149,9 +183,10 @@ class _HomePageState extends State<HomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    if (user == null) {
-      return LoginPage();
-    }
+
+    // if (user == null) {
+    //   Navigator.of(context).pushNamed('/login');
+    // }
 
     return Scaffold(
       appBar: const CustomAppBar(
@@ -181,15 +216,22 @@ class _HomePageState extends State<HomePage> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: FutureBuilder<List<Post>?>(
+          child: FutureBuilder<List<Post>>(
             future: futurePosts,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                return postWidgetList(snapshot.data!, context);
+                print("TRUE");
+                print(snapshot);
+
+                List<Post> postList = snapshot.data! as List<Post>;
+
+                return postWidgetList(postList, context);
 
                 ///return Text(snapshot.data![0].title);
               } else if (snapshot.hasError) {
-                return Text('${snapshot.error}');
+                print("Snapshot error");
+                //                return Text('${snapshot.error}');
+                return const CircularProgressIndicator();
               }
 
               return const CircularProgressIndicator();
