@@ -62,7 +62,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/posts': (context) => const HomePage(title: 'Blog'),
         '/postdetail': (context) => const PostDetailPage(),
-        '/createPost': (context) => const PostForm(),
+        '/createPost': (context) => const PostForm(title: 'Add Post'),
         '/createCategory': (context) => const CategoryForm(),
         '/login': (context) => LoginPage(),
         '/profile': (context) => ProfilePage(user: currentUser!),
