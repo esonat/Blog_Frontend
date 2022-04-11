@@ -11,9 +11,9 @@ class CategoryRepository {
 
   Future<Post> getPostById(int id) async => service.getPostById(id);
 
-  Future<Post> addPost(Post newPost) => service.addPost(post);
+  Future<Post> addPost(Post newPost) => service.addPost(newPost);
 
-  Future<Post> updatePost(int id, Post post) async => service.updatePost(id);
+  Future<Post> updatePost(int id, Post post) async => service.updatePost(id,post);
 
   Future<void> deletePost(int id) async => service.deletePost(id);
 }

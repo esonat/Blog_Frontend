@@ -135,6 +135,7 @@ Future<Post> addPost(Post post) async {
       'Text': post.text,
       'Category': post.category,
       'User': post.blogUser,
+      'LikeCount': post.likeCount,
     }),
   );
 
@@ -144,6 +145,38 @@ Future<Post> addPost(Post post) async {
   //   'Category':post.category
   // }));
   //jsonEncode(post));
+
+  if (response.statusCode == 201) {
+    return Post.fromJson(jsonDecode(response.body));
+  } else {
+    throw Exception("Failed to add post");
+  }
+}
+
+Future<Post> updatePost(Post post) async {
+  Map<String, String> requestHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Content-Type": "application/json",
+  };
+
+  print("updatePost: Post id=" + post.id.toString());
+
+  final response = await http.patch(
+    Uri.parse('http://localhost:8080/posts/' + post.id.toString()),
+    headers: requestHeaders,
+    // headers: <String, String>{
+    //   'Content-Type': 'application/json; charset=UTF-8',
+    // },
+    body: jsonEncode(<String, dynamic>{
+      'Title': post.title,
+      'Text': post.text,
+      'Category': post.category,
+      'User': post.blogUser,
+      'LikeCount': post.likeCount,
+    }),
+  );
+
+  print('http://localhost:8080/posts/' + post.id.toString());
 
   if (response.statusCode == 201) {
     return Post.fromJson(jsonDecode(response.body));

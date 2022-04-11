@@ -1,3 +1,42 @@
+// import 'dart:async';
+// import 'dart:convert';
+// import 'package:blog/screens/post_detail_page.dart';
+// import 'models/Post.dart';
+// import 'models/Category.dart';
+// import 'models/BlogUser.dart';
+// import 'package:flutter/material.dart';
+// import 'package:http/http.dart' as http;
+// import 'package:dart_json_mapper/dart_json_mapper.dart';
+// import 'package:path/path.dart';
+// //import 'auth/Registration.dart';
+// import 'util/CustomAppBar.dart';
+// import 'package:firebase_auth/firebase_auth.dart'; // new
+// import 'package:firebase_core/firebase_core.dart'; // new
+// import 'package:google_fonts/google_fonts.dart';
+// import 'package:provider/provider.dart'; // new
+// import '../screens/login_page.dart';
+// import '../screens/profile_page.dart';
+// import '../screens/register_page.dart';
+// import 'firebase_options.dart'; // new
+// import '../util/app_bloc_observer.dart';
+// import '../screens/home_page.dart';
+// import '../screens/post_form.dart';
+// import '../screens/category_form.dart';
+// import 'package:flutter_bloc/flutter_bloc.dart';
+// import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+// // Future main() async {
+// //   WidgetsFlutterBinding.ensureInitialized();
+// //   await Firebase.initializeApp(
+// //     options: DefaultFirebaseOptions.currentPlatform,
+// //   );
+// //   await dotenv.load(fileName: "assets/.env");
+// //   BlocOverrides.runZoned(
+// //     () => runApp(const MyApp()),
+// //     blocObserver: AppBlocObserver(),
+// //   );
+// }
+
 import 'dart:async';
 import 'dart:convert';
 import 'package:blog/screens/post_detail_page.dart';
@@ -22,6 +61,7 @@ import 'firebase_options.dart'; // new
 import '../screens/home_page.dart';
 import '../screens/post_form.dart';
 import '../screens/category_form.dart';
+import 'util/arguments.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -61,8 +101,8 @@ class MyApp extends StatelessWidget {
       initialRoute: '/login',
       routes: {
         '/posts': (context) => const HomePage(title: 'Blog'),
-        '/postdetail': (context) => const PostDetailPage(),
-        '/createPost': (context) => const PostForm(title: 'Add Post'),
+        '/postdetail': (context) => const PostDetailPage(id: 1),
+        '/createPost': (context) => const PostForm(),
         '/createCategory': (context) => const CategoryForm(),
         '/login': (context) => LoginPage(),
         '/profile': (context) => ProfilePage(user: currentUser!),
@@ -71,6 +111,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 //
 // class LoginPage extends StatelessWidget {
 //   @override

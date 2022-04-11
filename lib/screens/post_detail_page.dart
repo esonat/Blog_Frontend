@@ -17,11 +17,13 @@ import '../firebase_options.dart'; // new
 import '../api/api.dart';
 import '../screens/post_detail_page.dart';
 import '../util/arguments.dart';
+import 'package:like_button/like_button.dart';
 
 class PostDetailPage extends StatefulWidget {
-  const PostDetailPage({Key? key}) : super(key: key);
+  const PostDetailPage({Key? key, required this.id}) : super(key: key);
 
   static const routeName = '/postdetail';
+  final int? id;
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
   // how it looks.
@@ -37,6 +39,7 @@ class PostDetailPage extends StatefulWidget {
 
 class _PostDetailPageState extends State<PostDetailPage> {
   late Future<Post> futurePost;
+  //late Post post;
   User? user;
   //int id=0;
 
@@ -44,7 +47,22 @@ class _PostDetailPageState extends State<PostDetailPage> {
   void initState() {
     super.initState();
     user = FirebaseAuth.instance.currentUser;
+    // initializePost();
   }
+
+  // void initializePost() async {
+  //   post = await getPost(widget.id)!;
+  // }
+
+  // Future<bool> likePost(bool isLiked) async {
+  //   int likeCount = post.likeCount;
+  //   print("isLiked true");
+  //   post.likeCount = likeCount + 1;
+  //   print("updatePost called with like_count:" + post.likeCount.toString());
+  //   futurePost = updatePost(post);
+
+  //   return !isLiked;
+  // }
 
   Widget postWidget(Post post) {
     List<Widget> children = [];
@@ -81,37 +99,61 @@ class _PostDetailPageState extends State<PostDetailPage> {
             ],
           ),
           const SizedBox(height: 5),
-          Row(children: [
-            Expanded(
-              child: FutureBuilder<BlogUser>(
-                future: getBlogUserByUsername(user!.displayName!),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    BlogUser blogUser = snapshot.data as BlogUser;
-                    return Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                              width: 50.0,
-                              height: 50.0,
-                              child:
-                                  Image(image: AssetImage(blogUser.imagePath))),
-                        ),
-                      ],
-                    );
-                  } else if (snapshot.hasError) {
-                    return Text('${snapshot.error}');
-                  }
-                  //   return Text(blogUser!.username);
-                  // } else if (snapshot.hasError) {
-                  //   return Text('${snapshot.error}');
-                  // }
+          Row(
+            children: [
+              Expanded(
+                child: FutureBuilder<BlogUser>(
+                  future: getBlogUserByUsername(user!.displayName!),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      BlogUser blogUser = snapshot.data as BlogUser;
+                      return Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                                width: 50.0,
+                                height: 50.0,
+                                child: Image(
+                                    image: AssetImage(blogUser.imagePath))),
+                          ),
+                        ],
+                      );
+                    } else if (snapshot.hasError) {
+                      return Text('${snapshot.error}');
+                    }
+                    //   return Text(blogUser!.username);
+                    // } else if (snapshot.hasError) {
+                    //   return Text('${snapshot.error}');
+                    // }
 
-                  return const CircularProgressIndicator();
+                    return const CircularProgressIndicator();
+                  },
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.thumb_up),
+                onPressed: () {
+                  setState(() {
+                    int likeCount = post.likeCount;
+                    print("isLiked true");
+                    post.likeCount = likeCount + 1;
+                    print("updatePost called with like_count:" +
+                        post.likeCount.toString());
+
+                    try {
+                      futurePost = updatePost(post);
+                    } catch (e) {
+                      print("Update Post error:" + e.toString());
+                    }
+                  });
                 },
               ),
-            )
-          ])
+            ],
+          ),
         ],
       ),
     );
@@ -122,9 +164,21 @@ class _PostDetailPageState extends State<PostDetailPage> {
     );
   }
 
+  // LikeButton(
+  //   size: 15,
+  //   likeCount: post.likeCount,
+  //   likeBuilder: (bool like) {
+  //     return const Icon(
+  //       Icons.thumb_up,
+  //       color: Colors.blue,
+  //     );
+  //   },
+  //   onTap: likePost,
+  // ),
+
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as IdParameter;
+    // final args = ModalRoute.of(context)!.settings.arguments as IdParameter;
 
     if (user == null) {
       return LoginPage();
@@ -137,7 +191,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
       appBar: const CustomAppBar(),
       body: Center(
           child: FutureBuilder<Post>(
-              future: getPost(args.id),
+              // future: getPost(args.id),
+              future: getPost(widget.id),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return postWidget(snapshot.data!);

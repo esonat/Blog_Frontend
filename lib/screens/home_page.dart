@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:like_button/like_button.dart';
+
 import '../models/Post.dart';
 import '../models/Category.dart';
 import '../models/BlogUser.dart';
@@ -77,8 +79,12 @@ class _HomePageState extends State<HomePage> {
             Expanded(
                 child: GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(context, PostDetailPage.routeName,
-                              arguments: IdParameter(posts[i].id))
+                      print("Id:" + posts[i].id.toString());
+                      Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      PostDetailPage(id: posts[i].id)))
                           .then(onGoBack);
                     },
                     // onTap: () {
@@ -118,6 +124,7 @@ class _HomePageState extends State<HomePage> {
               blogUser = snapshot.data as BlogUser;
               return Text(blogUser!.username);
             } else if (snapshot.hasError) {
+              print('getBlogUserById snapshot error');
               return Text('${snapshot.error}');
             }
 
@@ -145,6 +152,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 );
               } else if (snapshot.hasError) {
+                print('getBlogUserById image snapshot error');
                 return Text('${snapshot.error}');
               }
               //   return Text(blogUser!.username);
@@ -158,6 +166,20 @@ class _HomePageState extends State<HomePage> {
         )
       ]));
 
+      // children.add(Row(children: [
+      //   Expanded(
+      //     child: LikeButton(
+      //       size: 15,
+      //       likeCount: 0,
+      //       likeBuilder: (bool like) {
+      //         return const Icon(
+      //           Icons.thumb_up,
+      //           color: Colors.blue,
+      //         );
+      //       },
+      //     ),
+      //   ),
+      // ]));
       // children.add(
       //   Row(
       //     children: [
@@ -237,6 +259,33 @@ class _HomePageState extends State<HomePage> {
               return const CircularProgressIndicator();
             },
           ),
+        ),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text('Blog'),
+            ),
+            ListTile(
+              title: const Text('Create Post'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/createPost');
+              },
+            ),
+            ListTile(
+              title: const Text('Create Category'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/createCategory');
+              },
+            ),
+          ],
         ),
       ),
     );

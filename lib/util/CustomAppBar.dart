@@ -4,22 +4,22 @@ import '../screens/login_page.dart';
 import 'appbar_link.dart';
 import 'fire_auth.dart';
 
+String? getCurrentRoute(BuildContext context) {
+  var route = ModalRoute.of(context);
 
-String? getCurrentRoute(BuildContext context){
-  var route=ModalRoute.of(context);
-
-  if(route!=null){
-    print("Current Route:"+route.settings.name!);
+  if (route != null) {
+    print("Current Route:" + route.settings.name!);
     return route.settings.name;
   }
 
   return null;
 }
-class CustomAppBar extends StatefulWidget implements PreferredSizeWidget{
+
+class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   const CustomAppBar({Key? key}) : super(key: key);
 
   @override
-   Size get preferredSize => const Size.fromHeight(100);
+  Size get preferredSize => const Size.fromHeight(100);
 
   @override
   CustomAppBarState createState() {
@@ -27,9 +27,9 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget{
   }
 }
 
- class CustomAppBarState extends State<CustomAppBar>{
+class CustomAppBarState extends State<CustomAppBar> {
   // const ({Key? key}) : super(key: key);
-  bool _userLoggedIn=false;
+  bool _userLoggedIn = false;
 
   // Widget headers(BuildContext context){
   //   User? user=FirebaseAuth.instance.currentUser;
@@ -99,65 +99,56 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget{
   //     ),
   //   ),
 
+  @override
+  Widget build(BuildContext context) {
+    User? user = FirebaseAuth.instance.currentUser;
 
+    if (user != null) {
+      print('Current user:' + user.email!);
+      _userLoggedIn = true;
+    }
 
-
-
-
-
-
-   @override
-   Widget build(BuildContext context){
-     User? user=FirebaseAuth.instance.currentUser;
-
-    if(user != null){
-      print('Current user:'+user.email!);
-      _userLoggedIn=true;
-     }
-
-     if(_userLoggedIn){
-       return AppBar(
-         title: header_link(context,'Blog'),
-                //actions: <Widget>[
-         actions: [
-           header_link(context,'Create Post'),
-           header_link(context,'Create Category'),
-         MouseRegion(
-           cursor: SystemMouseCursors.click,
-           child: TextButton(
-             child: const Text(
-               'Sign Out',
-               textAlign:TextAlign.start,
-               style: TextStyle(fontSize: 18.0, color: Colors.white)),
-             onPressed: () async {
-                User? user=FirebaseAuth.instance.currentUser;
+    if (_userLoggedIn) {
+      return AppBar(
+        title: header_link(context, 'Blog'),
+        //actions: <Widget>[
+        actions: [
+          //  header_link(context,'Create Post'),
+          //  header_link(context,'Create Category'),
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: TextButton(
+              child: const Text('Sign Out',
+                  textAlign: TextAlign.start,
+                  style: TextStyle(fontSize: 18.0, color: Colors.white)),
+              onPressed: () async {
+                User? user = FirebaseAuth.instance.currentUser;
                 if (user != null) {
-                  print('Current user email:'+user.email!);
+                  print('Current user email:' + user.email!);
                   await FirebaseAuth.instance.signOut();
                 }
                 // FireAuth.signOut(user
 
-                 Navigator.of(context).pushReplacement(
-                   MaterialPageRoute(
-                     builder: (context) => LoginPage(),
-                   ),
-                 );
-               },
-             ),
-           ),
-         ],
-       );
-     }
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => LoginPage(),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      );
+    }
 
-
-     return AppBar(
-       //title: header_link(context,'Blog'),
-              //actions: <Widget>[
-       actions: [
-         // header_link(context,'Create Post'),
-         // header_link(context,'Create Category'),
-         header_link(context,'Login'),
-       ],
+    return AppBar(
+      //title: header_link(context,'Blog'),
+      //actions: <Widget>[
+      actions: [
+        // header_link(context,'Create Post'),
+        // header_link(context,'Create Category'),
+        header_link(context, 'Login'),
+      ],
     );
   }
 }

@@ -6,13 +6,15 @@ class Post {
       required this.title,
       required this.text,
       required this.category,
-      required this.blogUser});
+      required this.blogUser,
+      required this.likeCount});
 
   int? id;
   String title;
   String text;
   int category;
   int blogUser;
+  int likeCount;
 
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
@@ -21,6 +23,7 @@ class Post {
       text: json['Text'],
       category: json['Category'],
       blogUser: json['User'],
+      likeCount: json['LikeCount'],
     );
   }
 
@@ -31,6 +34,7 @@ class Post {
       'Text': text,
       'Category': category.toString(),
       'User': blogUser.toString(),
+      'LikeCount': likeCount.toString(),
     };
   }
 
@@ -43,6 +47,8 @@ class Post {
         "Category:" +
         category.toString() +
         "User:" +
-        blogUser.toString();
+        blogUser.toString() +
+        "LikeCount" +
+        likeCount.toString();
   }
 }
