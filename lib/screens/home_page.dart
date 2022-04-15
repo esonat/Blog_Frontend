@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:blog/screens/posts_by_category_page.dart';
 import 'package:like_button/like_button.dart';
 
 import '../models/Post.dart';
@@ -40,6 +41,27 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late Future<List<Post>> futurePosts;
+  late Future<List<DropdownMenuItem<String>>> futureCategories;
+  String dropdownValue = '1';
+
+  Future<List<DropdownMenuItem<String>>> categoryNames() async {
+    List<Category> categories = await allCategories();
+    List<DropdownMenuItem<String>> list = [];
+    List<String> names = [];
+
+    if (categories != null) {
+      for (var i = 0; i < categories.length; i++) {
+        list.add(DropdownMenuItem<String>(
+          value: categories[i].id.toString(),
+          child: Text(categories[i].name),
+        ));
+
+        names.add(categories[i].name);
+      }
+    }
+
+    return list;
+  }
 
   User? user;
   // handlePosts(List<Post> content){
@@ -51,6 +73,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     futurePosts = allPosts();
+    futureCategories = categoryNames();
     user = FirebaseAuth.instance.currentUser;
   }
 
@@ -166,28 +189,6 @@ class _HomePageState extends State<HomePage> {
         )
       ]));
 
-      // children.add(Row(children: [
-      //   Expanded(
-      //     child: LikeButton(
-      //       size: 15,
-      //       likeCount: 0,
-      //       likeBuilder: (bool like) {
-      //         return const Icon(
-      //           Icons.thumb_up,
-      //           color: Colors.blue,
-      //         );
-      //       },
-      //     ),
-      //   ),
-      // ]));
-      // children.add(
-      //   Row(
-      //     children: [
-      //       Expanded(child: Image.network(blogUser!.imagePath)),
-      //     ],
-      //   ),
-      // );
-
       children.add(const SizedBox(height: 50));
     }
     return Container(
@@ -248,8 +249,6 @@ class _HomePageState extends State<HomePage> {
                 List<Post> postList = snapshot.data! as List<Post>;
 
                 return postWidgetList(postList, context);
-
-                ///return Text(snapshot.data![0].title);
               } else if (snapshot.hasError) {
                 print("Snapshot error");
                 //                return Text('${snapshot.error}');
@@ -283,6 +282,47 @@ class _HomePageState extends State<HomePage> {
               onTap: () {
                 Navigator.pop(context);
                 Navigator.pushNamed(context, '/createCategory');
+              },
+            ),
+            FutureBuilder(
+              future: futureCategories,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return DropdownButton<String>(
+                    value: dropdownValue,
+                    icon: const Icon(Icons.arrow_downward),
+                    elevation: 16,
+                    style: const TextStyle(color: Colors.deepPurple),
+                    underline: Container(
+                      height: 2,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        dropdownValue = newValue!;
+                        Navigator.pop(context);
+                        Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        PostsByCategory(categoryId: newValue)))
+                            .then(onGoBack);
+                      });
+                    },
+                    items: snapshot.data! as List<DropdownMenuItem<String>>,
+                    // items: <String>['One', 'Two', 'Free', 'Four']
+                    //     .map<DropdownMenuItem<String>>((String value) {
+                    //   return DropdownMenuItem<String>(
+                    //     value: value,
+                    //     child: Text(value),
+                    //   );
+                    // }).toList(),
+                  );
+                } else if (snapshot.hasError) {
+                  return Text('${snapshot.error}');
+                }
+
+                return const CircularProgressIndicator();
               },
             ),
           ],
