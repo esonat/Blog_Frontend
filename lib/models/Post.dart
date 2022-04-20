@@ -7,7 +7,8 @@ class Post {
       required this.text,
       required this.category,
       required this.blogUser,
-      required this.likeCount});
+      required this.likeCount,
+      required this.imagePath});
 
   int? id;
   String title;
@@ -15,6 +16,7 @@ class Post {
   int category;
   int blogUser;
   int likeCount;
+  String imagePath;
 
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
@@ -24,6 +26,7 @@ class Post {
       category: json['Category'],
       blogUser: json['User'],
       likeCount: json['LikeCount'],
+      imagePath: json['ImagePath'],
     );
   }
 
@@ -35,6 +38,7 @@ class Post {
       'Category': category.toString(),
       'User': blogUser.toString(),
       'LikeCount': likeCount.toString(),
+      'ImagePath': imagePath,
     };
   }
 
@@ -49,6 +53,8 @@ class Post {
         "User:" +
         blogUser.toString() +
         "LikeCount" +
-        likeCount.toString();
+        likeCount.toString() +
+        "ImagePath" +
+        imagePath;
   }
 }

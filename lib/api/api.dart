@@ -154,6 +154,7 @@ Future<Post> addPost(Post post) async {
       'Category': post.category,
       'User': post.blogUser,
       'LikeCount': post.likeCount,
+      'ImagePath': post.imagePath,
     }),
   );
 
@@ -191,6 +192,7 @@ Future<Post> updatePost(Post post) async {
       'Category': post.category,
       'User': post.blogUser,
       'LikeCount': post.likeCount,
+      'ImagePath': post.imagePath,
     }),
   );
 

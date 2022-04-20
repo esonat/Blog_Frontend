@@ -763,6 +763,7 @@ class PostFormState extends State<PostForm> {
   Widget build(BuildContext context) {
     String title = 'title';
     String text = 'text';
+    String imagePath = '';
     String categoryID = '1';
 
     if (user == null) {
@@ -867,6 +868,27 @@ class PostFormState extends State<PostForm> {
                   return const CircularProgressIndicator();
                 },
               ),
+              Text('Image Path'),
+              TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter image path';
+                  }
+                  imagePath = value;
+
+                  return null;
+                },
+                onFieldSubmitted: (value) {
+                  setState(() {
+                    imagePath = value;
+                  });
+                },
+                onChanged: (String? value) {
+                  setState(() {
+                    imagePath = value!;
+                  });
+                },
+              ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: ElevatedButton(
@@ -881,7 +903,8 @@ class PostFormState extends State<PostForm> {
                           text: text,
                           category: int.parse(dropdownValue),
                           blogUser: blogUser!.id!,
-                          likeCount: 0);
+                          likeCount: 0,
+                          imagePath: imagePath);
 
                       futurePost = addPost(post);
                       print('Added post with title:' + title);

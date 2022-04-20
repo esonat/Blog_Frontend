@@ -92,10 +92,25 @@ class _PostDetailPageState extends State<PostDetailPage> {
           Row(
             children: [
               Expanded(
-                child: Text(user!.displayName!,
-                    style:
-                        TextStyle(fontSize: 12.0, fontWeight: FontWeight.w300)),
+                child: FutureBuilder<BlogUser>(
+                  future: getBlogUserById(post.blogUser),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      BlogUser blogUser = snapshot.data as BlogUser;
+                      return Text(blogUser.username,
+                          style: TextStyle(
+                              fontSize: 12.0, fontWeight: FontWeight.w300));
+                    } else if (snapshot.hasError) {
+                      return Text('${snapshot.error}');
+                    }
+                    return const CircularProgressIndicator();
+                  },
+                ),
               ),
+              //   child: Text(user!.displayName!,
+              //       style:
+              //           TextStyle(fontSize: 12.0, fontWeight: FontWeight.w300)),
+              // ),
             ],
           ),
           const SizedBox(height: 5),
@@ -103,7 +118,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
             children: [
               Expanded(
                 child: FutureBuilder<BlogUser>(
-                  future: getBlogUserByUsername(user!.displayName!),
+                  //future: getBlogUserByUsername(user!.displayName!),
+                  future: getBlogUserById(post.blogUser),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       BlogUser blogUser = snapshot.data as BlogUser;

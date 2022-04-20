@@ -236,29 +236,35 @@ class _HomePageState extends State<HomePage> {
           //     ],
           //       //    Navigator.push(context,MaterialPageRoute(builder: (context) => const PostForm())).then((value) { setState(() {} }));
           ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: FutureBuilder<List<Post>>(
-            future: futurePosts,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                print("TRUE");
-                print(snapshot);
+      body: GridView.count(
+        crossAxisCount: 3,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: FutureBuilder<List<Post>>(
+              future: futurePosts,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  print("TRUE");
+                  print(snapshot);
 
-                List<Post> postList = snapshot.data! as List<Post>;
+                  List<Post> postList = snapshot.data! as List<Post>;
 
-                return postWidgetList(postList, context);
-              } else if (snapshot.hasError) {
-                print("Snapshot error");
-                //                return Text('${snapshot.error}');
+                  return postWidgetList(postList, context);
+                } else if (snapshot.hasError) {
+                  print("Snapshot error");
+                  //                return Text('${snapshot.error}');
+                  return const CircularProgressIndicator();
+                }
+
                 return const CircularProgressIndicator();
-              }
-
-              return const CircularProgressIndicator();
-            },
+              },
+            ),
           ),
-        ),
+        ],
+
+        //child: SingleChildScrollView(
+        //child:(
       ),
       drawer: Drawer(
         child: ListView(
