@@ -68,6 +68,19 @@ class _PostDetailPageState extends State<PostDetailPage> {
     List<Widget> children = [];
 
     children.add(
+      Container(
+        height: 200.0,
+        child: Column(
+          children: [
+            Expanded(
+              child: Image.asset(post.imagePath),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    children.add(
       Column(
         children: [
           Row(

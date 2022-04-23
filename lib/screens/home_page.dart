@@ -97,174 +97,130 @@ class _HomePageState extends State<HomePage> {
 
     for (var i = 0; i < posts.length; i++) {
       children.add(
-        Row(
-          children: [
-            Expanded(
-                child: GestureDetector(
-                    onTap: () {
-                      print("Id:" + posts[i].id.toString());
-                      Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      PostDetailPage(id: posts[i].id)))
-                          .then(onGoBack);
-                    },
-                    // onTap: () {
-                    //   Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (context) => const PostDetailPage(),
-                    //       settings: RouteSettings(
-                    //         arguments: IdParameter(posts[i].id),
-                    //       ),
-                    //     ),
-                    //   ).then(onGoBack);
-                    // },
-                    child: Text(posts[i].title,
-                        style: const TextStyle(
-                            fontSize: 18.0, fontWeight: FontWeight.w700)))),
-          ],
-        ),
-      );
-
-      children.add(
-        Row(
-          children: [
-            Expanded(
-                child: Text(posts[i].text,
-                    style: const TextStyle(fontSize: 15.0))),
-          ],
-        ),
-      );
-
-      children.add(
-        FutureBuilder<BlogUser>(
-          future: getBlogUserById(posts[i].blogUser),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              print("BlogUser:" + blogUser.toString());
-              blogUser = snapshot.data as BlogUser;
-              return Text(blogUser!.username);
-            } else if (snapshot.hasError) {
-              print('getBlogUserById snapshot error');
-              return Text('${snapshot.error}');
-            }
-
-            return const CircularProgressIndicator();
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PostDetailPage(id: posts[i].id)))
+                .then(onGoBack);
           },
+          child: Column(
+            children: [
+              Expanded(child: Image.asset(posts[i].imagePath)),
+              Text(posts[i].title),
+            ],
+          ),
         ),
       );
 
-      children.add(Row(children: [
-        Expanded(
-          child: FutureBuilder<BlogUser>(
-            future: getBlogUserById(posts[i].blogUser),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                print("BlogUser:" + blogUser.toString());
-                blogUser = snapshot.data as BlogUser;
-                return Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                          width: 50.0,
-                          height: 50.0,
-                          child: Image(image: AssetImage(blogUser!.imagePath))),
-                    ),
-                  ],
-                );
-              } else if (snapshot.hasError) {
-                print('getBlogUserById image snapshot error');
-                return Text('${snapshot.error}');
-              }
-              //   return Text(blogUser!.username);
-              // } else if (snapshot.hasError) {
-              //   return Text('${snapshot.error}');
-              // }
+      // children.add(
+      //   GestureDetector(
+      //     onTap: () {
+      //       print("Id:" + posts[i].id.toString());
+      //       Navigator.push(
+      //               context,
+      //               MaterialPageRoute(
+      //                   builder: (context) => PostDetailPage(id: posts[i].id)))
+      //           .then(onGoBack);
+      //     },
+      //     child: Text(
+      //       posts[i].title,
+      //       style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.w700),
+      //     ),
+      //   ),
+      // );
 
-              return const CircularProgressIndicator();
-            },
-          ),
-        )
-      ]));
+      // Text(posts[i].text, style: const TextStyle(fontSize: 15.0)),
+      // children.add(
+      //   FutureBuilder<BlogUser>(
+      //     future: getBlogUserById(posts[i].blogUser),
+      //     builder: (context, snapshot) {
+      //       if (snapshot.hasData) {
+      //         print("BlogUser:" + blogUser.toString());
+      //         blogUser = snapshot.data as BlogUser;
 
-      children.add(const SizedBox(height: 50));
+      //         return ConstrainedBox(
+      //             constraints:
+      //                 const BoxConstraints(maxWidth: 50, maxHeight: 50),
+      //             child: Column(children: [
+      //               Image(image: AssetImage(blogUser!.imagePath)),
+      //               Text(blogUser!.username),
+      //             ]));
+      //       } else if (snapshot.hasError) {
+      //         print('getBlogUserById snapshot error');
+      //         return Text('${snapshot.error}');
+      //       }
+
+      //       return const CircularProgressIndicator();
+      //     },
+      //   ),
+      // );
+
+      // children.add(
+      //   FutureBuilder<BlogUser>(
+      //     future: getBlogUserById(posts[i].blogUser),
+      //     builder: (context, snapshot) {
+      //       if (snapshot.hasData) {
+      //         print("BlogUser:" + blogUser.toString());
+      //         blogUser = snapshot.data as BlogUser;
+      //         return Container(
+      //           width: 50.0,
+      //           height: 50.0,
+      //           child: Image(image: AssetImage(blogUser!.imagePath)),
+      //         );
+      //       } else if (snapshot.hasError) {
+      //         print('getBlogUserById image snapshot error');
+      //         return Text('${snapshot.error}');
+      //       }
+      //       return const CircularProgressIndicator();
+      //     },
+      //   ),
+      // );
     }
-    return Container(
-      width: 500,
-      child: Column(children: children),
+
+    return GridView.count(
+      primary: false,
+      padding: const EdgeInsets.all(20),
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 10,
+      crossAxisCount: 3,
+      children: children,
     );
+
+    // return Container(
+    //   width: 500,
+    //   child: Column(children: children),
+    // );
     //child: Column(children:children),
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-
     // if (user == null) {
     //   Navigator.of(context).pushNamed('/login');
     // }
 
     return Scaffold(
-      appBar: const CustomAppBar(
-          // appBar: AppBar(
-          //   //Here we take the value from the MyHomePage object that was created by
-          //   //the App.build method, and use it to set our appbar title.
-          //   title: Text(widget.title),
-          //   actions: <Widget>[
-          //     TextButton(
-          //       child: const Text(
-          //         'Create Post',
-          //         textAlign:TextAlign.start,
-          //         style: TextStyle(fontSize: 18.0, color: Colors.white)),
-          //       onPressed: () {
-          //         // Navigator.push(
-          //         //   context,
-          //         //   MaterialPageRoute(builder: (context) => const PostForm())).then((value) { setState(() {} );});
-          //         // },
-          //         Navigator.push(
-          //           context,
-          //           MaterialPageRoute(builder: (context) => const PostForm())).then((value) { onGoBack(value);});
-          //         },
-          //       ),
-          //     ],
-          //       //    Navigator.push(context,MaterialPageRoute(builder: (context) => const PostForm())).then((value) { setState(() {} }));
-          ),
-      body: GridView.count(
-        crossAxisCount: 3,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: FutureBuilder<List<Post>>(
-              future: futurePosts,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  print("TRUE");
-                  print(snapshot);
+      appBar: const CustomAppBar(),
+      body: FutureBuilder<List<Post>>(
+        future: futurePosts,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            print("TRUE");
+            print(snapshot);
 
-                  List<Post> postList = snapshot.data! as List<Post>;
+            List<Post> postList = snapshot.data! as List<Post>;
 
-                  return postWidgetList(postList, context);
-                } else if (snapshot.hasError) {
-                  print("Snapshot error");
-                  //                return Text('${snapshot.error}');
-                  return const CircularProgressIndicator();
-                }
+            return postWidgetList(postList, context);
+          } else if (snapshot.hasError) {
+            print("Snapshot error");
+            //                return Text('${snapshot.error}');
+            return const CircularProgressIndicator();
+          }
 
-                return const CircularProgressIndicator();
-              },
-            ),
-          ),
-        ],
-
-        //child: SingleChildScrollView(
-        //child:(
+          return const CircularProgressIndicator();
+        },
       ),
       drawer: Drawer(
         child: ListView(
