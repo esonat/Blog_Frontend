@@ -137,6 +137,35 @@ Future<List<Post>> allPosts() async {
   return result;
 }
 
+Future<List<Post>> getPostsByRange(int limit) async {
+  // Map<String, String> requestHeaders = {
+  //   "Access-Control-Allow-Origin":"*",
+  // };
+
+  final response = await http
+      .get(Uri.parse('http://localhost:8080/posts/limit/' + limit.toString()));
+
+  print("Limit:" + limit.toString());
+
+  List<dynamic> posts = await json.decode(response.body);
+  List<Post> result = [];
+
+  if (response.statusCode == 200) {
+    for (var i = 0; i < posts.length; i++) {
+      result.add(Post.fromJson(posts[i]));
+      print(Post.fromJson(posts[i]).toString());
+    }
+  } else {
+    throw Exception("Failed to load posts");
+  }
+
+  // for(var i=0;i<result.length;i++){
+  //     print(result[i].toString());
+  // }
+
+  return result;
+}
+
 Future<Post> addPost(Post post) async {
   // Map<String, String> requestHeaders = {
   //   "Access-Control-Allow-Origin":"*",

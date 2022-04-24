@@ -43,6 +43,7 @@ class _HomePageState extends State<HomePage> {
   late Future<List<Post>> futurePosts;
   late Future<List<DropdownMenuItem<String>>> futureCategories;
   String dropdownValue = '1';
+  int limit = 9;
 
   Future<List<DropdownMenuItem<String>>> categoryNames() async {
     List<Category> categories = await allCategories();
@@ -72,7 +73,9 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    futurePosts = allPosts();
+    //futurePosts = allPosts();
+    limit = 9;
+    futurePosts = getPostsByRange(limit);
     futureCategories = categoryNames();
     user = FirebaseAuth.instance.currentUser;
   }
@@ -113,70 +116,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       );
-
-      // children.add(
-      //   GestureDetector(
-      //     onTap: () {
-      //       print("Id:" + posts[i].id.toString());
-      //       Navigator.push(
-      //               context,
-      //               MaterialPageRoute(
-      //                   builder: (context) => PostDetailPage(id: posts[i].id)))
-      //           .then(onGoBack);
-      //     },
-      //     child: Text(
-      //       posts[i].title,
-      //       style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.w700),
-      //     ),
-      //   ),
-      // );
-
-      // Text(posts[i].text, style: const TextStyle(fontSize: 15.0)),
-      // children.add(
-      //   FutureBuilder<BlogUser>(
-      //     future: getBlogUserById(posts[i].blogUser),
-      //     builder: (context, snapshot) {
-      //       if (snapshot.hasData) {
-      //         print("BlogUser:" + blogUser.toString());
-      //         blogUser = snapshot.data as BlogUser;
-
-      //         return ConstrainedBox(
-      //             constraints:
-      //                 const BoxConstraints(maxWidth: 50, maxHeight: 50),
-      //             child: Column(children: [
-      //               Image(image: AssetImage(blogUser!.imagePath)),
-      //               Text(blogUser!.username),
-      //             ]));
-      //       } else if (snapshot.hasError) {
-      //         print('getBlogUserById snapshot error');
-      //         return Text('${snapshot.error}');
-      //       }
-
-      //       return const CircularProgressIndicator();
-      //     },
-      //   ),
-      // );
-
-      // children.add(
-      //   FutureBuilder<BlogUser>(
-      //     future: getBlogUserById(posts[i].blogUser),
-      //     builder: (context, snapshot) {
-      //       if (snapshot.hasData) {
-      //         print("BlogUser:" + blogUser.toString());
-      //         blogUser = snapshot.data as BlogUser;
-      //         return Container(
-      //           width: 50.0,
-      //           height: 50.0,
-      //           child: Image(image: AssetImage(blogUser!.imagePath)),
-      //         );
-      //       } else if (snapshot.hasError) {
-      //         print('getBlogUserById image snapshot error');
-      //         return Text('${snapshot.error}');
-      //       }
-      //       return const CircularProgressIndicator();
-      //     },
-      //   ),
-      // );
     }
 
     return GridView.count(
