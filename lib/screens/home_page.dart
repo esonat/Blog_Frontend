@@ -43,7 +43,8 @@ class _HomePageState extends State<HomePage> {
   late Future<List<Post>> futurePosts;
   late Future<List<DropdownMenuItem<String>>> futureCategories;
   String dropdownValue = '1';
-  int limit = 9;
+  int limit = 6;
+  late ScrollController controller;
 
   Future<List<DropdownMenuItem<String>>> categoryNames() async {
     List<Category> categories = await allCategories();
@@ -74,10 +75,17 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     //futurePosts = allPosts();
-    limit = 9;
+    limit = 6;
     futurePosts = getPostsByRange(limit);
     futureCategories = categoryNames();
     user = FirebaseAuth.instance.currentUser;
+    controller = ScrollController()..addListener(_scrollListener);
+  }
+
+  @override
+  void dispose() {
+    controller.removeListener(_scrollListener);
+    super.dispose();
   }
 
   FutureOr onGoBack(dynamic value) {
@@ -124,6 +132,7 @@ class _HomePageState extends State<HomePage> {
       crossAxisSpacing: 10,
       mainAxisSpacing: 10,
       crossAxisCount: 3,
+      controller: controller,
       children: children,
     );
 
@@ -230,5 +239,16 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  void _scrollListener() {
+    print(controller.position.extentAfter);
+    if (controller.position.extentAfter < 500) {
+      setState(() {
+        limit += 9;
+        futurePosts = getPostsByRange(limit);
+        print("Limit:" + limit.toString());
+      });
+    }
   }
 }
